@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\bootstrap.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\utils\pattern.cpp" />
+    <ClCompile Include="src\utils\singleton.hpp" />
+    <ClCompile Include="src\utils\structs.hpp" />
+    <ClCompile Include="src\base\cleaner\unloaded_module.cpp" />
+    <ClCompile Include="src\utils\memory.cpp" />
+    <ClCompile Include="src\base\raot.cpp" />
+    <ClCompile Include="src\base\features\modules\module_manager.cpp" />
+    <ClCompile Include="src\base\features\modules\abstract_module.cpp" />
+    <ClCompile Include="src\utils\animation\animation.cpp" />
+    <ClCompile Include="src\base\webui\server.cpp" />
+    <ClCompile Include="src\base\features\events\events.cpp" />
+    <ClCompile Include="src\base\features\modules\common_data.cpp" />
+    <ClCompile Include="src\base\features\config\config_system.cpp" />
+    <ClCompile Include="src\utils\types\math.cpp" />
+    <ClCompile Include="ext\kiero\kiero.cpp" />
+    <ClCompile Include="src\base\render\d3dhook.cpp" />
+    <ClCompile Include="ext\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ext\imgui\imgui_tables.cpp" />
+    <ClCompile Include="ext\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ext\imgui\imgui.cpp" />
+    <ClCompile Include="ext\imgui\imgui_demo.cpp" />
+    <ClCompile Include="ext\imgui\imgui_draw.cpp" />
+    <ClCompile Include="ext\imgui\imgui_impl_dx11.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ext\json.hpp" />
+    <ClInclude Include="src\base\GitInfo.h" />
+    <ClInclude Include="src\base\features\modules\fight\AutoClicker.h" />
+    <ClInclude Include="src\utils\animation\animation.h" />
+    <ClInclude Include="src\utils\function_traits.hpp" />
+    <ClInclude Include="ext\lazy_importer.hpp" />
+    <ClInclude Include="ext\titan_hook.h" />
+    <ClInclude Include="src\base\features\modules\ModuleManager.hpp" />
+    <ClInclude Include="src\base\sdk\Mapper\resources\maps\vanilla112.h" />
+    <ClInclude Include="src\main.hpp" />
+    <ClInclude Include="src\utils\pattern.h" />
+    <ClInclude Include="src\utils\strutils.h" />
+    <ClInclude Include="src\utils\timer_util.hpp" />
+    <ClInclude Include="src\utils\types\math.hpp" />
+    <ClInclude Include="src\utils\wnd.h" />
+    <ClInclude Include="src\base\cleaner\unloaded_module.h" />
+    <ClInclude Include="src\utils\memory.h" />
+    <ClInclude Include="src\utils\thread.h" />
+    <ClInclude Include="src\log\LOG.h" />
+    <ClInclude Include="src\base\raot.h" />
+    <ClInclude Include="src\base\render\resources\image\watermark.h" />
+    <ClInclude Include="src\base\features\values\value.h" />
+    <ClInclude Include="src\base\features\modules\module_manager.h" />
+    <ClInclude Include="src\base\features\modules\abstract_module.h" />
+    <ClInclude Include="src\base\webui\server.h" />
+    <ClInclude Include="src\base\webui\index.h" />
+    <ClInclude Include="ext\event_bus.hpp" />
+    <ClInclude Include="src\base\features\events\events.h" />
+    <ClInclude Include="src\base\features\modules\common_data.h" />
+    <ClInclude Include="src\base\features\config\config_system.h" />
+    <ClInclude Include="ext\kiero\kiero.h" />
+    <ClInclude Include="src\base\render\d3dhook.h" />
+    <ClInclude Include="ext\detours\HookManager.h" />
+    <ClInclude Include="ext\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="ext\imgui\imgui_internal.h" />
+    <ClInclude Include="ext\imgui\imstb_rectpack.h" />
+    <ClInclude Include="ext\imgui\imstb_textedit.h" />
+    <ClInclude Include="ext\imgui\imstb_truetype.h" />
+    <ClInclude Include="ext\imgui\imconfig.h" />
+    <ClInclude Include="ext\imgui\imgui.h" />
+    <ClInclude Include="ext\imgui\imgui_impl_dx11.h" />
+  </ItemGroup>
+</Project>
