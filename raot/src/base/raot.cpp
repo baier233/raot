@@ -7,6 +7,8 @@
 #include <base/features/modules/common_data.h>
 
 #include <windows.h>
+#include <base/render/d3dhook.h>
+#include <base/render/gui/gui.h>
 
 bool raot::setup()
 {
@@ -18,7 +20,10 @@ bool raot::setup()
 	(void)common_data::get();
 	mm->load_modules();
 	webui::server::get().start(8080);
-	return flag;
+	dx_hook::Hk11::Build([&]() {
+		gui::do_render();
+		});
+	return true;
 }
 void raot::enter_loop()
 {

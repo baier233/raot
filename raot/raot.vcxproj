@@ -276,6 +276,7 @@
     <ClCompile Include="ext\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="ext\imgui\imgui_tables.cpp" />
     <ClCompile Include="ext\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\base\render\gui\gui.cpp" />
     <ClCompile Include="src\base\render\d3dhook.cpp" />
     <ClCompile Include="ext\kiero\kiero.cpp" />
     <ClCompile Include="src\base\features\config\config_system.cpp" />
@@ -305,6 +306,7 @@
     <ClInclude Include="ext\imgui\imstb_rectpack.h" />
     <ClInclude Include="ext\imgui\imstb_textedit.h" />
     <ClInclude Include="ext\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\base\render\gui\gui.h" />
     <ClInclude Include="src\base\render\d3dhook.h" />
     <ClInclude Include="ext\kiero\kiero.h" />
     <ClInclude Include="src\base\features\config\config_system.h" />

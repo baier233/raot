@@ -19,13 +19,14 @@
     <ClCompile Include="src\utils\types\math.cpp" />
     <ClCompile Include="ext\kiero\kiero.cpp" />
     <ClCompile Include="src\base\render\d3dhook.cpp" />
+    <ClCompile Include="src\base\render\gui\gui.cpp" />
+    <ClCompile Include="ext\imgui\imgui_draw.cpp" />
+    <ClCompile Include="ext\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="ext\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="ext\imgui\imgui_tables.cpp" />
     <ClCompile Include="ext\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ext\imgui\imgui.cpp" />
     <ClCompile Include="ext\imgui\imgui_demo.cpp" />
-    <ClCompile Include="ext\imgui\imgui_draw.cpp" />
-    <ClCompile Include="ext\imgui\imgui_impl_dx11.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\json.hpp" />
@@ -61,6 +62,8 @@
     <ClInclude Include="ext\kiero\kiero.h" />
     <ClInclude Include="src\base\render\d3dhook.h" />
     <ClInclude Include="ext\detours\HookManager.h" />
+    <ClInclude Include="src\base\render\gui\gui.h" />
+    <ClInclude Include="ext\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="ext\imgui\imgui_impl_win32.h" />
     <ClInclude Include="ext\imgui\imgui_internal.h" />
     <ClInclude Include="ext\imgui\imstb_rectpack.h" />
@@ -68,6 +71,5 @@
     <ClInclude Include="ext\imgui\imstb_truetype.h" />
     <ClInclude Include="ext\imgui\imconfig.h" />
     <ClInclude Include="ext\imgui\imgui.h" />
-    <ClInclude Include="ext\imgui\imgui_impl_dx11.h" />
   </ItemGroup>
 </Project>

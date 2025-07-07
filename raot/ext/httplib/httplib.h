@@ -329,7 +329,8 @@ namespace httplib {
 
 		struct scope_exit {
 			explicit scope_exit(std::function<void(void)>&& f)
-				: exit_function(std::move(f)), execute_on_destruction{ true } {}
+				: exit_function(std::move(f)), execute_on_destruction{ true } {
+			}
 
 			scope_exit(scope_exit&& rhs)
 				: exit_function(std::move(rhs.exit_function)),
@@ -439,7 +440,8 @@ namespace httplib {
 
 		ContentReader(Reader reader, MultipartReader multipart_reader)
 			: reader_(std::move(reader)),
-			multipart_reader_(std::move(multipart_reader)) {}
+			multipart_reader_(std::move(multipart_reader)) {
+		}
 
 		bool operator()(MultipartContentHeader header,
 			ContentReceiver receiver) const {
@@ -973,7 +975,8 @@ namespace httplib {
 		Result(std::unique_ptr<Response>&& res, Error err,
 			Headers&& request_headers = Headers{})
 			: res_(std::move(res)), err_(err),
-			request_headers_(std::move(request_headers)) {}
+			request_headers_(std::move(request_headers)) {
+		}
 		// Response
 		operator bool() const { return res_ != nullptr; }
 		bool operator==(std::nullptr_t) const { return res_ == nullptr; }
@@ -2511,7 +2514,8 @@ namespace httplib {
 		inline stream_line_reader::stream_line_reader(Stream& strm, char* fixed_buffer,
 			size_t fixed_buffer_size)
 			: strm_(strm), fixed_buffer_(fixed_buffer),
-			fixed_buffer_size_(fixed_buffer_size) {}
+			fixed_buffer_size_(fixed_buffer_size) {
+		}
 
 		inline const char* stream_line_reader::ptr() const {
 			if (glowable_buffer_.empty()) {
@@ -2689,11 +2693,11 @@ namespace httplib {
 			return handle_EINTR([&]() {
 				return recv(sock,
 #ifdef _WIN32
-				static_cast<char*>(ptr), static_cast<int>(size),
+					static_cast<char*>(ptr), static_cast<int>(size),
 #else
-				ptr, size,
+					ptr, size,
 #endif
-				flags);
+					flags);
 				});
 		}
 
@@ -2702,11 +2706,11 @@ namespace httplib {
 			return handle_EINTR([&]() {
 				return send(sock,
 #ifdef _WIN32
-				static_cast<const char*>(ptr), static_cast<int>(size),
+					static_cast<const char*>(ptr), static_cast<int>(size),
 #else
-				ptr, size,
+					ptr, size,
 #endif
-				flags);
+					flags);
 				});
 		}
 
@@ -2940,8 +2944,8 @@ namespace httplib {
 				svr_sock, sock, keep_alive_max_count, keep_alive_timeout_sec,
 				[&](bool close_connection, bool& connection_closed) {
 					SocketStream strm(sock, read_timeout_sec, read_timeout_usec,
-					write_timeout_sec, write_timeout_usec);
-			return callback(strm, close_connection, connection_closed);
+						write_timeout_sec, write_timeout_usec);
+					return callback(strm, close_connection, connection_closed);
 				});
 		}
 
@@ -4767,7 +4771,7 @@ namespace httplib {
 				[&](const std::string& token) { strm.write(token); },
 				[&](size_t offset, size_t length) {
 					return write_content(strm, res.content_provider_, offset, length,
-					is_shutting_down);
+						is_shutting_down);
 				});
 		}
 
@@ -5091,7 +5095,8 @@ namespace httplib {
 		public:
 			explicit ContentProviderAdapter(
 				ContentProviderWithoutLength&& content_provider)
-				: content_provider_(content_provider) {}
+				: content_provider_(content_provider) {
+			}
 
 			bool operator()(size_t offset, size_t, DataSink& sink) {
 				return content_provider_(offset, sink);
@@ -5358,7 +5363,8 @@ namespace httplib {
 			: sock_(sock), read_timeout_sec_(read_timeout_sec),
 			read_timeout_usec_(read_timeout_usec),
 			write_timeout_sec_(write_timeout_sec),
-			write_timeout_usec_(write_timeout_usec), read_buff_(read_buff_size_, 0) {}
+			write_timeout_usec_(write_timeout_usec), read_buff_(read_buff_size_, 0) {
+		}
 
 		inline SocketStream::~SocketStream() {}
 
@@ -5465,10 +5471,12 @@ namespace httplib {
 		}
 
 		inline void BufferStream::get_remote_ip_and_port(std::string& /*ip*/,
-			int& /*port*/) const {}
+			int& /*port*/) const {
+		}
 
 		inline void BufferStream::get_local_ip_and_port(std::string& /*ip*/,
-			int& /*port*/) const {}
+			int& /*port*/) const {
+		}
 
 		inline socket_t BufferStream::socket() const { return 0; }
 
@@ -6338,8 +6346,8 @@ namespace httplib {
 					},
 					[&](MultipartContentHeader header, ContentReceiver receiver) {
 						return read_content_with_content_receiver(strm, req, res, nullptr,
-						std::move(header),
-						std::move(receiver));
+							std::move(header),
+							std::move(receiver));
 					});
 
 				if (req.method == "POST") {
@@ -6699,7 +6707,7 @@ namespace httplib {
 			write_timeout_usec_,
 			[this](Stream& strm, bool close_connection, bool& connection_closed) {
 				return process_request(strm, close_connection, connection_closed,
-				nullptr);
+					nullptr);
 			});
 
 		detail::shutdown_socket(sock);
@@ -6709,17 +6717,20 @@ namespace httplib {
 
 	// HTTP client implementation
 	inline ClientImpl::ClientImpl(const std::string& host)
-		: ClientImpl(host, 80, std::string(), std::string()) {}
+		: ClientImpl(host, 80, std::string(), std::string()) {
+	}
 
 	inline ClientImpl::ClientImpl(const std::string& host, int port)
-		: ClientImpl(host, port, std::string(), std::string()) {}
+		: ClientImpl(host, port, std::string(), std::string()) {
+	}
 
 	inline ClientImpl::ClientImpl(const std::string& host, int port,
 		const std::string& client_cert_path,
 		const std::string& client_key_path)
 		: host_(host), port_(port),
 		host_and_port_(adjust_host_string(host) + ":" + std::to_string(port)),
-		client_cert_path_(client_cert_path), client_key_path_(client_key_path) {}
+		client_cert_path_(client_cert_path), client_key_path_(client_key_path) {
+	}
 
 	inline ClientImpl::~ClientImpl() {
 		std::lock_guard<std::mutex> guard(socket_mutex_);
@@ -7434,20 +7445,20 @@ namespace httplib {
 							return true;
 					});
 
-					auto progress = [&](uint64_t current, uint64_t total) {
-						if (!req.progress || redirect) { return true; }
-						auto ret = req.progress(current, total);
-						if (!ret) { error = Error::Canceled; }
-						return ret;
-						};
+			auto progress = [&](uint64_t current, uint64_t total) {
+				if (!req.progress || redirect) { return true; }
+				auto ret = req.progress(current, total);
+				if (!ret) { error = Error::Canceled; }
+				return ret;
+				};
 
-					int dummy_status;
-					if (!detail::read_content(strm, res, (std::numeric_limits<size_t>::max)(),
-						dummy_status, std::move(progress), std::move(out),
-						decompress_)) {
-						if (error != Error::Canceled) { error = Error::Read; }
-						return false;
-					}
+			int dummy_status;
+			if (!detail::read_content(strm, res, (std::numeric_limits<size_t>::max)(),
+				dummy_status, std::move(progress), std::move(out),
+				decompress_)) {
+				if (error != Error::Canceled) { error = Error::Read; }
+				return false;
+			}
 		}
 
 		// Log
@@ -8237,8 +8248,8 @@ namespace httplib {
 				svr_sock, sock, keep_alive_max_count, keep_alive_timeout_sec,
 				[&](bool close_connection, bool& connection_closed) {
 					SSLSocketStream strm(sock, ssl, read_timeout_sec, read_timeout_usec,
-					write_timeout_sec, write_timeout_usec);
-			return callback(strm, close_connection, connection_closed);
+						write_timeout_sec, write_timeout_usec);
+					return callback(strm, close_connection, connection_closed);
 				});
 		}
 
@@ -8466,7 +8477,7 @@ namespace httplib {
 				[this, ssl](Stream& strm, bool close_connection,
 					bool& connection_closed) {
 						return process_request(strm, close_connection, connection_closed,
-						[&](Request& req) { req.ssl = ssl; });
+							[&](Request& req) { req.ssl = ssl; });
 				});
 
 			// Shutdown gracefully if the result seemed successful, non-gracefully if
@@ -8482,10 +8493,12 @@ namespace httplib {
 
 	// SSL HTTP client implementation
 	inline SSLClient::SSLClient(const std::string & host)
-		: SSLClient(host, 443, std::string(), std::string()) {}
+		: SSLClient(host, 443, std::string(), std::string()) {
+	}
 
 	inline SSLClient::SSLClient(const std::string & host, int port)
-		: SSLClient(host, port, std::string(), std::string()) {}
+		: SSLClient(host, port, std::string(), std::string()) {
+	}
 
 	inline SSLClient::SSLClient(const std::string & host, int port,
 		const std::string & client_cert_path,
@@ -8892,7 +8905,8 @@ namespace httplib {
 
 	// Universal client implementation
 	inline Client::Client(const std::string & scheme_host_port)
-		: Client(scheme_host_port, std::string(), std::string()) {}
+		: Client(scheme_host_port, std::string(), std::string()) {
+	}
 
 	inline Client::Client(const std::string & scheme_host_port,
 		const std::string & client_cert_path,
@@ -8943,13 +8957,15 @@ namespace httplib {
 	}
 
 	inline Client::Client(const std::string & host, int port)
-		: cli_(detail::make_unique<ClientImpl>(host, port)) {}
+		: cli_(detail::make_unique<ClientImpl>(host, port)) {
+	}
 
 	inline Client::Client(const std::string & host, int port,
 		const std::string & client_cert_path,
 		const std::string & client_key_path)
 		: cli_(detail::make_unique<ClientImpl>(host, port, client_cert_path,
-			client_key_path)) {}
+			client_key_path)) {
+	}
 
 	inline Client::~Client() {}
 
