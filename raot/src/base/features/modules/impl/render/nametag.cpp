@@ -33,6 +33,11 @@ void nametag::on_update()
 			{
 				continue;
 			}
+			auto fps = client->get_fps(client);
+			if (fps != 0)
+			{
+				continue;
+			}
 			auto instance_player = client->get_player(client);
 			if (!instance_player)
 			{
@@ -53,6 +58,7 @@ void nametag::on_update()
 			{
 				continue;
 			}
+
 			auto name = client->get_network_sync_name(client);
 			if (!name)
 			{
