@@ -27,6 +27,12 @@
     <ClCompile Include="ext\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ext\imgui\imgui.cpp" />
     <ClCompile Include="ext\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\base\features\modules\impl\render\nametag.cpp" />
+    <ClCompile Include="src\base\sdk\sdk.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorClientObject.cpp" />
+    <ClCompile Include="src\base\sdk\game\ClientPlayerInstance.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorClientModule.cpp" />
+    <ClCompile Include="src\base\sdk\game\AoTNetworkModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\json.hpp" />
@@ -71,5 +77,12 @@
     <ClInclude Include="ext\imgui\imstb_truetype.h" />
     <ClInclude Include="ext\imgui\imconfig.h" />
     <ClInclude Include="ext\imgui\imgui.h" />
+    <ClInclude Include="src\base\features\modules\impl\render\nametag.h" />
+    <ClInclude Include="src\base\sdk\sdk.h" />
+    <ClInclude Include="ext\UnityResolve.hpp" />
+    <ClInclude Include="src\base\sdk\game\MirrorClientObject.h" />
+    <ClInclude Include="src\base\sdk\game\ClientPlayerInstance.h" />
+    <ClInclude Include="src\base\sdk\game\MirrorClientModule.h" />
+    <ClInclude Include="src\base\sdk\game\AoTNetworkModule.h" />
   </ItemGroup>
 </Project>

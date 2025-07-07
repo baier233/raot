@@ -7,15 +7,18 @@
 #include <base/features/modules/common_data.h>
 
 #include <windows.h>
+
 #include <base/render/d3dhook.h>
 #include <base/render/gui/gui.h>
+
+#include <base/sdk/sdk.h>
 
 bool raot::setup()
 {
 	bool flag = false;
 
 	static auto _mm = std::make_unique<module_manager>();
-
+	sdk::init(false);
 	mm = _mm.get();
 	(void)common_data::get();
 	mm->load_modules();
@@ -25,12 +28,26 @@ bool raot::setup()
 		});
 	return true;
 }
+#include <game/AoTNetworkModule.h>
+#include <game/MirrorClientModule.h>
 void raot::enter_loop()
 {
 
-
+	for (auto& m : I::assembly)
+	{
+		std::cout << "Assembly: " << m->name << std::endl;
+	}
 	while (!this->exited) {
+		auto mirror_client_module = AoTNetworkModule::get_instance<MirrorClientModule>(MirrorClientModule::cached);
+		if (mirror_client_module)
+		{
 
+			auto clients = mirror_client_module->get_clients();
+			std::cout << "clients :" << clients.size() << std::endl;
+		}
+
+		//auto instance = MirrorClientModule::get_instance();
+		//std::cout << "instance :" << instance << std::endl;
 		auto mods = mm->get_modules();
 
 		std::vector<key_event> key_to_process;

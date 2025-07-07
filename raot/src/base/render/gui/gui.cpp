@@ -7,6 +7,7 @@
 #include <string>
 #include <format>
 #include <base/render/d3dhook.h>
+#include <base/sdk/sdk.h>
 extern auto ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 static void render_gui_internal() {
 	ImGui::SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
@@ -19,6 +20,7 @@ void gui::do_render()
 {
 	static std::once_flag flag;
 	std::call_once(flag, []() {
+		sdk::attach();
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(dx_hook::Hk11::GetHwnd());
 		ImGui_ImplDX11_Init(dx_hook::Hk11::GetDevice(), dx_hook::Hk11::GetContext());
@@ -37,7 +39,7 @@ void gui::do_render()
 
 			switch (msg) {
 			case WM_KEYDOWN:
-				if ((wParam == VK_DELETE) || (wParam == VK_END)) {
+				if (wParam == VK_DELETE) {
 					gui::show = !gui::show;
 				}
 				break;
@@ -57,8 +59,11 @@ void gui::do_render()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	if (gui::show)
+	{
 
-	render_gui_internal();
+		render_gui_internal();
+	}
 
 	ImGui::EndFrame();
 	ImGui::Render();

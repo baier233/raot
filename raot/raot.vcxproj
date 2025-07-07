@@ -188,7 +188,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -269,6 +269,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\base\sdk\game\AoTNetworkModule.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorClientModule.cpp" />
+    <ClCompile Include="src\base\sdk\game\ClientPlayerInstance.cpp" />
     <ClCompile Include="ext\imgui\imgui.cpp" />
     <ClCompile Include="ext\imgui\imgui_demo.cpp" />
     <ClCompile Include="ext\imgui\imgui_draw.cpp" />
@@ -276,6 +279,9 @@
     <ClCompile Include="ext\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="ext\imgui\imgui_tables.cpp" />
     <ClCompile Include="ext\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorClientObject.cpp" />
+    <ClCompile Include="src\base\sdk\sdk.cpp" />
+    <ClCompile Include="src\base\features\modules\impl\render\nametag.cpp" />
     <ClCompile Include="src\base\render\gui\gui.cpp" />
     <ClCompile Include="src\base\render\d3dhook.cpp" />
     <ClCompile Include="ext\kiero\kiero.cpp" />
@@ -297,6 +303,9 @@
     <ClCompile Include="src\utils\types\math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\base\sdk\game\AoTNetworkModule.h" />
+    <ClInclude Include="src\base\sdk\game\MirrorClientModule.h" />
+    <ClInclude Include="src\base\sdk\game\ClientPlayerInstance.h" />
     <ClInclude Include="ext\detours\HookManager.h" />
     <ClInclude Include="ext\imgui\imconfig.h" />
     <ClInclude Include="ext\imgui\imgui.h" />
@@ -306,6 +315,10 @@
     <ClInclude Include="ext\imgui\imstb_rectpack.h" />
     <ClInclude Include="ext\imgui\imstb_textedit.h" />
     <ClInclude Include="ext\imgui\imstb_truetype.h" />
+    <ClInclude Include="ext\UnityResolve.hpp" />
+    <ClInclude Include="src\base\sdk\game\MirrorClientObject.h" />
+    <ClInclude Include="src\base\sdk\sdk.h" />
+    <ClInclude Include="src\base\features\modules\impl\render\nametag.h" />
     <ClInclude Include="src\base\render\gui\gui.h" />
     <ClInclude Include="src\base\render\d3dhook.h" />
     <ClInclude Include="ext\kiero\kiero.h" />
