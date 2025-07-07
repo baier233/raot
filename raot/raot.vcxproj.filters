@@ -33,6 +33,9 @@
     <ClCompile Include="src\base\sdk\game\ClientPlayerInstance.cpp" />
     <ClCompile Include="src\base\sdk\game\MirrorClientModule.cpp" />
     <ClCompile Include="src\base\sdk\game\AoTNetworkModule.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorClientObjectNetwork.cpp" />
+    <ClCompile Include="src\base\sdk\game\CharacterObject.cpp" />
+    <ClCompile Include="src\base\render\fonts\fonts.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\json.hpp" />
@@ -84,5 +87,9 @@
     <ClInclude Include="src\base\sdk\game\ClientPlayerInstance.h" />
     <ClInclude Include="src\base\sdk\game\MirrorClientModule.h" />
     <ClInclude Include="src\base\sdk\game\AoTNetworkModule.h" />
+    <ClInclude Include="src\base\sdk\game\MirrorClientObjectNetwork.h" />
+    <ClInclude Include="src\base\sdk\game\CharacterObject.h" />
+    <ClInclude Include="src\base\render\fonts\harmony_sc_regular.h" />
+    <ClInclude Include="src\base\render\fonts\fonts.h" />
   </ItemGroup>
 </Project>

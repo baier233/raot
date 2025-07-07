@@ -14,9 +14,23 @@ public:
 			for (size_t i = 0; i < instances->iCount; i++)
 			{
 				auto key = instances->GetKeyByIndex(i);
+				/*
+index 0 :AoTNetworking.Modules.MirrorClientModule
+index 1 :AoTNetworking.Modules.MirrorPlayerModule
+index 2 :AoTNetworking.Modules.MirrorRoundClockModule
+index 3 :AoTNetworking.Modules.MirrorScoreboardModule
+index 4 :AoTNetworking.Modules.MirrorGameModeCoreModule
+index 5 :AoTNetworking.Modules.Chat.MirrorChatModule
+index 6 :AoTNetworking.Modules.MirrorTeamCharacterModule
+index 7 :AoTNetworking.Modules.MirrorPvpModule
+index 8 :AoTNetworking.Modules.MirrorObjectiveModule
+index 9 :AoTNetworking.Modules.MirrorProjectileModule
+index 10 :AoTNetworking.Modules.MirrorFlareModule
+				*/
+
+				//std::cout << "index " << i << " :" << key->FormatTypeName()->ToString() << std::endl;
 				if (!key)
 				{
-					//std::cout << "index " << i << " :" << key->FormatTypeName()->ToString() << std::endl;
 					continue;
 				}
 				if (key == type)

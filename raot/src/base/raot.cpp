@@ -28,8 +28,6 @@ bool raot::setup()
 		});
 	return true;
 }
-#include <game/AoTNetworkModule.h>
-#include <game/MirrorClientModule.h>
 void raot::enter_loop()
 {
 
@@ -38,13 +36,7 @@ void raot::enter_loop()
 		std::cout << "Assembly: " << m->name << std::endl;
 	}
 	while (!this->exited) {
-		auto mirror_client_module = AoTNetworkModule::get_instance<MirrorClientModule>(MirrorClientModule::cached);
-		if (mirror_client_module)
-		{
 
-			auto clients = mirror_client_module->get_clients();
-			std::cout << "clients :" << clients.size() << std::endl;
-		}
 
 		//auto instance = MirrorClientModule::get_instance();
 		//std::cout << "instance :" << instance << std::endl;

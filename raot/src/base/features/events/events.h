@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <utils/types/math.hpp>
-struct event_render_2d
+struct render_2d_event
 {
 
 };

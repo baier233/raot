@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <sdk.h>
 #include "ClientPlayerInstance.h"
-class MirrorClientObject : public II::MonoBehaviour
+#include "MirrorClientObjectNetwork.h"
+class MirrorClientObject : public MirrorClientObjectNetwork
 {
 public:
 	inline static I::MethodPointer < ClientPlayerInstance*, MirrorClientObject* > get_player = nullptr;

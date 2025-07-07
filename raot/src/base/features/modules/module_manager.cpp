@@ -60,8 +60,9 @@ std::vector<HMOD> module_manager::get_enable_modules()
 {
 	return this->enable_modules;
 }
+#include "impl/render/nametag.h"
 bool module_manager::load_modules()
 {
-
+	this->add_module<nametag>();
 	return true;
 }
