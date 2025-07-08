@@ -12,9 +12,9 @@ void abstract_module::toggle()
 
 void abstract_module::on_toggle()
 {
-	if (this->i_toggle) this->on_disable();
-	if (!this->i_toggle) this->on_enable();
 	this->i_toggle = !this->i_toggle;
+	if (!this->i_toggle) this->on_disable();
+	if (this->i_toggle) this->on_enable();
 }
 
 std::string abstract_module::get_name()

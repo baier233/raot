@@ -122,7 +122,18 @@ public:
 			return Invoke<void*>("mono_type_get_object", pDomain, address);
 		}
 	};
+	template <typename T>
+	static auto DontDestroyOnLoad(T* obj) -> void {
+		static Method* pMethod;
 
+		if (!pMethod) pMethod = UnityResolve::Get("UnityEngine.CoreModule.dll")->Get("Object")->Get<Method>("DontDestroyOnLoad", { "UnityEngine.Object" });
+		if (pMethod)
+		{
+			pMethod->Invoke<void>(obj);
+		}
+
+		return;
+	}
 	struct Class final {
 		void* address;
 		std::string name;
@@ -196,6 +207,7 @@ public:
 
 			return std::vector<T>(0);
 		}
+
 
 		template <typename T>
 		auto New() -> T* {
@@ -2274,6 +2286,21 @@ public:
 		};
 
 		struct Camera : Component {
+			auto GetEnabled() -> bool {
+
+				static Method* method;
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Behaviour")->Get<Method>("get_enabled");
+				if (method) return method->Invoke<bool>(this);
+				return false;
+			}
+
+			auto SetEnabled(const bool value) -> void {
+
+				static Method* method;
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Behaviour")->Get<Method>("set_enabled");
+				if (method) return method->Invoke<void>(this, value);
+			}
+
 			enum class Eye : int {
 				Left,
 				Right,
@@ -2286,6 +2313,8 @@ public:
 				if (method) return method->Invoke<Camera*>();
 				return nullptr;
 			}
+
+
 
 			static auto GetCurrent() -> Camera* {
 				static Method* method;
@@ -2437,6 +2466,20 @@ public:
 				static Method* method;
 
 				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("set_right");
+				if (method) return method->Invoke<void>(this, value);
+			}
+			auto GetLocalEulerAngles() -> Vector3 {
+				static Method* method;
+
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("get_localEulerAngles");
+				if (method) return method->Invoke<Vector3>(this);
+				return {};
+			}
+
+			auto SetLocalEulerAngles(const Vector3& value) -> void {
+				static Method* method;
+
+				if (!method) method = Get("UnityEngine.CoreModule.dll")->Get("Transform")->Get<Method>("set_localEulerAngles");
 				if (method) return method->Invoke<void>(this, value);
 			}
 
@@ -2712,6 +2755,20 @@ public:
 				return T();
 			}
 
+			template <typename T>
+			auto AddComponent(CsType* componentType) -> T {
+
+				static Method* method = nullptr;
+				if (!method) {
+					method = Get("UnityEngine.CoreModule.dll")->Get("GameObject")->Get<Method>("AddComponent", { "System.Type" });
+				}
+
+				if (method) {
+					return method->Invoke<T>(this, componentType);
+				}
+
+				return T();
+			}
 			template <typename T>
 			auto GetComponent(Class* type) -> T {
 

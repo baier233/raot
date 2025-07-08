@@ -269,6 +269,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\base\features\modules\impl\render\freecam.cpp" />
     <ClCompile Include="src\base\render\fonts\fonts.cpp" />
     <ClCompile Include="src\base\sdk\game\CharacterObject.cpp" />
     <ClCompile Include="src\base\sdk\game\MirrorClientObjectNetwork.cpp" />
@@ -306,6 +307,7 @@
     <ClCompile Include="src\utils\types\math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\base\features\modules\impl\render\freecam.h" />
     <ClInclude Include="src\base\render\fonts\fonts.h" />
     <ClInclude Include="src\base\render\fonts\harmony_sc_regular.h" />
     <ClInclude Include="src\base\sdk\game\CharacterObject.h" />

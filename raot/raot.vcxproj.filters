@@ -36,6 +36,7 @@
     <ClCompile Include="src\base\sdk\game\MirrorClientObjectNetwork.cpp" />
     <ClCompile Include="src\base\sdk\game\CharacterObject.cpp" />
     <ClCompile Include="src\base\render\fonts\fonts.cpp" />
+    <ClCompile Include="src\base\features\modules\impl\render\freecam.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\json.hpp" />
@@ -91,5 +92,6 @@
     <ClInclude Include="src\base\sdk\game\CharacterObject.h" />
     <ClInclude Include="src\base\render\fonts\harmony_sc_regular.h" />
     <ClInclude Include="src\base\render\fonts\fonts.h" />
+    <ClInclude Include="src\base\features\modules\impl\render\freecam.h" />
   </ItemGroup>
 </Project>
