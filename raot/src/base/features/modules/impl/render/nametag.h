@@ -12,6 +12,7 @@ public:
 protected:
 
 	DEFINE_BOOL_VALUE(text, "Text", "", true);
+	DEFINE_BOOL_VALUE(resize, "Resize", "", true);
 	DEFINE_BOOL_VALUE(tex_outlined, "Text Outlined", "", true);
 	DEFINE_FLOAT_VALUE(text_size, "Text Size", "", 18.f, 12.f, 24.f);
 };

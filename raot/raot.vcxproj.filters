@@ -37,6 +37,10 @@
     <ClCompile Include="src\base\sdk\game\CharacterObject.cpp" />
     <ClCompile Include="src\base\render\fonts\fonts.cpp" />
     <ClCompile Include="src\base\features\modules\impl\render\freecam.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorNetworkedPlayerNetwork.cpp" />
+    <ClCompile Include="src\base\features\modules\impl\combat\auto_parry.cpp" />
+    <ClCompile Include="src\base\sdk\game\MirrorNetworkedPlayer.cpp" />
+    <ClCompile Include="src\base\sdk\game\PlayerMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\json.hpp" />
@@ -93,5 +97,9 @@
     <ClInclude Include="src\base\render\fonts\harmony_sc_regular.h" />
     <ClInclude Include="src\base\render\fonts\fonts.h" />
     <ClInclude Include="src\base\features\modules\impl\render\freecam.h" />
+    <ClInclude Include="src\base\sdk\game\MirrorNetworkedPlayerNetwork.h" />
+    <ClInclude Include="src\base\features\modules\impl\combat\auto_parry.h" />
+    <ClInclude Include="src\base\sdk\game\MirrorNetworkedPlayer.h" />
+    <ClInclude Include="src\base\sdk\game\PlayerMain.h" />
   </ItemGroup>
 </Project>

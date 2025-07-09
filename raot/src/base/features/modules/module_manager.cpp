@@ -60,10 +60,13 @@ std::vector<HMOD> module_manager::get_enable_modules()
 {
 	return this->enable_modules;
 }
-#include "impl/render/nametag.h"
+#include "impl/combat/auto_parry.h"
 #include "impl/render/freecam.h"
+#include "impl/render/nametag.h"
 bool module_manager::load_modules()
 {
+	this->add_module<auto_parry>();
+
 	this->add_module<nametag>();
 	this->add_module<freecam>();
 	return true;

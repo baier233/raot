@@ -33,11 +33,11 @@ void nametag::on_update()
 			{
 				continue;
 			}
-			auto fps = client->get_fps(client);
+			/*auto fps = client->get_fps(client);
 			if (fps != 0)
 			{
 				continue;
-			}
+			}*/
 			auto instance_player = client->get_player(client);
 			if (!instance_player)
 			{
@@ -96,11 +96,14 @@ void nametag::on_update()
 
 static float TextColor[4]{ 1.0f, 1.0f, 1.0f, 1.0f * 255 };
 static float TextOutlineColor[4]{ 0, 0, 0, 1.0f * 255 };
+#include <utils/wnd.h>
+#include <base/render/d3dhook.h>
 void nametag::on_render_2d(const render_2d_event& e)
 {
 
 	if (!this->get_toggle()) return;
 	auto entites = std::vector<Entity>();
+	static auto dpi = utils::wnd::get_pixel_ratio(dx_hook::Hk11::GetHwnd());
 	{
 		std::lock_guard<std::mutex> lock(rs_mutex);
 		entites = rs;
@@ -120,7 +123,16 @@ void nametag::on_render_2d(const render_2d_event& e)
 
 	for (auto& entity : entites)
 	{
+		if (resize->get_value())
+		{
+			entity.headPoint.y /= 0.75;
+			entity.headPoint.x /= 0.75;
+
+		}
 		entity.headPoint.y = gui::height - entity.headPoint.y;
+
+
+
 		if ((entity.headPoint.x > 0 && entity.headPoint.y > 0) && (entity.headPoint.x < gui::width && entity.headPoint.y < gui::height) && entity.headPoint.z > 0) {
 			draw_out_lined_text(gui::font, text_size->get_value(), ImVec2(entity.headPoint.x, entity.headPoint.y), ImColor(255, 255, 255), ImColor(TextOutlineColor[0], TextOutlineColor[1], TextOutlineColor[2], TextOutlineColor[3]), (const char*)entity.name.c_str(), (const char*)(entity.name.c_str() + entity.name.size()));
 			/*ImGui::GetBackgroundDrawList()->AddText(ImVec2(entity.headPoint.x, entity.headPoint.y), ImColor(148, 105, 204), entity.name.c_str());*/
@@ -137,5 +149,5 @@ nametag::nametag() : instance_module("nametag", category::VISUAL)
 	add_value(values::BOOL, text);
 	add_value(values::BOOL, tex_outlined);
 	add_value(values::FLOAT, text_size);
-
+	add_value(values::BOOL, resize);
 }

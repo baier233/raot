@@ -55,19 +55,17 @@ void gui::do_render()
 					gui::show = !gui::show;
 				}
 				break;
-			case WM_SIZE:
-			{
-				int width = LOWORD(lParam);
-				int height = HIWORD(lParam);
-				gui::height = height;
-				gui::width = width;
-				break;
-			}
+				/*	case WM_SIZE:
+					{
+						int width = LOWORD(lParam);
+						int height = HIWORD(lParam);
+						gui::height = height;
+						gui::width = width;
+						break;
+					}*/
 			case WM_KEYUP: break;
 			case WM_CLOSE:
-				const auto result = MessageBox(nullptr, L"你确定要退出游戏吗?", L"Confirmation", MB_YESNO | MB_ICONQUESTION);
-				if (result == IDYES) exit(0);
-				if (result == IDNO) return 2;
+				exit(0);
 				break;
 
 			}

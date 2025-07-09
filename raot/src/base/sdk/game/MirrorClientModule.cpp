@@ -35,7 +35,6 @@ auto MirrorClientModule::init() -> void
 	if (const auto pClass = I::Get("Assembly-CSharp.dll")->Get("MirrorClientModule")) {
 		cached = pClass;
 		field_manifest = pClass->Get<IF>("<Manifest>k__BackingField");
-		field_manifest_var.Init(field_manifest);
 	}
 
 }

@@ -6,6 +6,9 @@
 #include <game/MirrorClientModule.h>
 #include <game/AoTNetworkModule.h>
 #include <game/CharacterObject.h>
+#include <game/MirrorNetworkedPlayer.h>
+#include <game/MirrorNetworkedPlayerNetwork.h>
+#include <game/PlayerMain.h>
 
 bool sdk::init(bool dump_sdk)
 {
@@ -24,6 +27,9 @@ bool sdk::init(bool dump_sdk)
 	AoTNetworkModule::init();
 	CharacterObject::init();
 	MirrorClientObjectNetwork::init();
+	MirrorNetworkedPlayer::init();
+	MirrorNetworkedPlayerNetwork::init();
+	PlayerMain::init();
 	return true;
 }
 
