@@ -61,11 +61,13 @@ std::vector<HMOD> module_manager::get_enable_modules()
 	return this->enable_modules;
 }
 #include "impl/combat/auto_parry.h"
+#include "impl/combat/apg_aimbot.h"
 #include "impl/render/freecam.h"
 #include "impl/render/nametag.h"
 bool module_manager::load_modules()
 {
 	this->add_module<auto_parry>();
+	this->add_module<apg_aimbot>();
 
 	this->add_module<nametag>();
 	this->add_module<freecam>();

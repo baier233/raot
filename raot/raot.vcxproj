@@ -269,6 +269,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\base\features\modules\impl\combat\apg_aimbot.cpp" />
     <ClCompile Include="src\base\sdk\game\PlayerMain.cpp" />
     <ClCompile Include="src\base\sdk\game\MirrorNetworkedPlayer.cpp" />
     <ClCompile Include="src\base\sdk\game\MirrorNetworkedPlayerNetwork.cpp" />
@@ -311,6 +312,7 @@
     <ClCompile Include="src\utils\types\math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\base\features\modules\impl\combat\apg_aimbot.h" />
     <ClInclude Include="src\base\sdk\game\PlayerMain.h" />
     <ClInclude Include="src\base\sdk\game\MirrorNetworkedPlayer.h" />
     <ClInclude Include="src\base\sdk\game\MirrorNetworkedPlayerNetwork.h" />
