@@ -13,6 +13,7 @@
 #include <cmath>
 #include <algorithm>
 #include <numbers>
+#include <optional>
 #include <iostream>
 #include <Windows.h>
 #undef max
@@ -35,13 +36,32 @@ std::unordered_map<MirrorClientObject*, std::deque<sample_t>> g_history;
 
 I::MethodPointer<MirrorClientObject*> fn_get_my_client = nullptr;
 
-// Offsets resolved at ctor (fallback defaults from IDA of RAoT 2.086):
-//   PlayerMain.<Camera>k__BackingField           → CameraController*
-//   CameraControlBase.targetEuler  (Vector3)     → desired pitch/yaw in degrees
-//   CameraControlBase.currentEuler (Vector3)     → interpolated pitch/yaw in degrees
-int32_t off_player_camera  = 0x88;
-int32_t off_target_euler   = 0x48;   // 0x10 (_o header) + 0x38 (field)
-int32_t off_current_euler  = 0x54;   // 0x10 (_o header) + 0x44 (field)
+// Persistent smoothing state across on_update ticks.
+struct smooth_state_t {
+	float pitch;
+	float yaw;
+	cclk::time_point last_tick;
+	MirrorClientObject* target;
+	bool locked;
+};
+std::optional<smooth_state_t> g_smooth_state;
+
+// Offsets resolved at ctor (fallback defaults from IDA of RAoT 2.086).
+// Camera:
+//   PlayerMain.<Camera>k__BackingField           -> CameraController*
+//   CameraControlBase.targetEuler  (Vector3)     -> desired pitch/yaw (degrees)
+//   CameraControlBase.currentEuler (Vector3)     -> interpolated pitch/yaw (degrees)
+int32_t off_player_camera     = 0x88;
+int32_t off_target_euler      = 0x48;   // 0x10 (_o header) + 0x38 (field)
+int32_t off_current_euler     = 0x54;   // 0x10 (_o header) + 0x44 (field)
+// Charge ("ready attack") state chain:
+//   CombatManager._ChargeHandler_k__BackingField       -> PlayerCombatChargeHandler*
+//   PlayerCombatChargeHandler._LeftHandler / _RightHandler -> PlayerCombatChargeSubHandler*
+//   PlayerCombatChargeSubHandler.attackChargeTime (float) == -1.0  -> not charging
+int32_t off_cm_charge_handler = 0x38;   // CombatManager, fields 0x28 + header 0x10
+int32_t off_ch_left_handler   = 0x18;   // ChargeHandler,  fields 0x08 + header 0x10
+int32_t off_ch_right_handler  = 0x20;   // ChargeHandler,  fields 0x10 + header 0x10
+int32_t off_sub_charge_time   = 0x28;   // SubHandler,     fields 0x18 + header 0x10
 
 inline II::Vector3 v3_sub(const II::Vector3& a, const II::Vector3& b) { return {a.x-b.x, a.y-b.y, a.z-b.z}; }
 inline II::Vector3 v3_add(const II::Vector3& a, const II::Vector3& b) { return {a.x+b.x, a.y+b.y, a.z+b.z}; }
@@ -86,30 +106,57 @@ II::Vector3 compute_aim_point(const II::Vector3& shooter,
 	return predicted;
 }
 
-// Unity ZXY Euler order:
-//   forward.x = sin(yaw)  * cos(pitch)
-//   forward.y = -sin(pitch)
-//   forward.z = cos(yaw)  * cos(pitch)
-// Inverse:
-//   pitch = -asin(forward.y)
-//   yaw   =  atan2(forward.x, forward.z)
 void direction_to_euler_deg(const II::Vector3& dir, float& pitch_deg, float& yaw_deg) {
 	float y = std::clamp(dir.y, -1.f, 1.f);
 	pitch_deg = -std::asin(y) * kRad2Deg;
 	yaw_deg   =  std::atan2(dir.x, dir.z) * kRad2Deg;
 }
 
-// Normalize angle delta to shortest path in [-180, 180]
 float shortest_angle_delta(float target, float current) {
 	float d = std::fmod(target - current + 540.f, 360.f) - 180.f;
 	return d;
 }
 
-bool trigger_active(apg_aimbot& self) {
-	if (self.always_on->get_value()) return true;
-	if (self.hold_rmb->get_value()) {
-		return (GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
+// Read a pointer field
+inline void* read_ptr(void* base, int32_t off) {
+	return *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(base) + off);
+}
+
+// Game's "ready attack" gate. Walk PlayerMain -> CombatManager -> ChargeHandler -> sub-handlers.
+// Returns:
+//   left_ready, right_ready  = true if that side's attackChargeTime != -1.0
+bool is_charge_active(PlayerMain* pm, bool& left_ready, bool& right_ready) {
+	left_ready  = false;
+	right_ready = false;
+	if (!pm || !PlayerMain::get_combat_manager) return false;
+	void* cm = PlayerMain::get_combat_manager(pm);
+	if (!cm) return false;
+	void* ch = read_ptr(cm, off_cm_charge_handler);
+	if (!ch) return false;
+	if (void* left = read_ptr(ch, off_ch_left_handler)) {
+		float t = *reinterpret_cast<float*>(reinterpret_cast<uint8_t*>(left) + off_sub_charge_time);
+		if (t != -1.0f) left_ready = true;
 	}
+	if (void* right = read_ptr(ch, off_ch_right_handler)) {
+		float t = *reinterpret_cast<float*>(reinterpret_cast<uint8_t*>(right) + off_sub_charge_time);
+		if (t != -1.0f) right_ready = true;
+	}
+	return left_ready || right_ready;
+}
+
+bool trigger_active(apg_aimbot& self, PlayerMain* pm) {
+	if (self.always_on->get_value()) return true;
+
+	// Must be in "ready attack" (charging) state first
+	bool left_ready = false, right_ready = false;
+	if (!is_charge_active(pm, left_ready, right_ready)) return false;
+
+	// Selected button(s) must also be held — this is how we distinguish which side the user
+	// wants aimbot on (e.g. only RMB-charged attacks, not LMB-charged).
+	bool rmb_held = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
+	bool lmb_held = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+	if (self.hold_rmb->get_value() && rmb_held) return true;
+	if (self.hold_lmb->get_value() && lmb_held) return true;
 	return false;
 }
 } // namespace
@@ -119,25 +166,36 @@ void apg_aimbot::on_enable() {
 }
 
 void apg_aimbot::on_disable() {
+	g_smooth_state.reset();
 	std::lock_guard<std::mutex> g(g_history_mutex);
 	g_history.clear();
-	AIM_LOG("on_disable: history cleared");
+	AIM_LOG("on_disable: state cleared");
 }
 
 void apg_aimbot::on_update() {
-	if (!get_toggle() || !trigger_active(*this)) return;
+	if (!get_toggle()) {
+		g_smooth_state.reset();
+		return;
+	}
 
 	auto* pm = PlayerMain::get_instance ? PlayerMain::get_instance() : nullptr;
-	if (!pm) return;
+	if (!pm) {
+		g_smooth_state.reset();
+		return;
+	}
 
-	// PlayerMain.<Camera>k__BackingField → CameraController (inherits CameraControlBase)
+	if (!trigger_active(*this, pm)) {
+		g_smooth_state.reset();
+		return;
+	}
+
+	// PlayerMain.<Camera>k__BackingField -> CameraController (inherits CameraControlBase)
 	void* cam_ctrl = *reinterpret_cast<void**>(reinterpret_cast<uint8_t*>(pm) + off_player_camera);
 	if (!cam_ctrl) return;
 
 	auto* target_euler  = reinterpret_cast<II::Vector3*>(reinterpret_cast<uint8_t*>(cam_ctrl) + off_target_euler);
 	auto* current_euler = reinterpret_cast<II::Vector3*>(reinterpret_cast<uint8_t*>(cam_ctrl) + off_current_euler);
 
-	// Shooter position & current forward for target selection (read from the Unity Camera transform)
 	auto* unity_cam_raw = PlayerMain::get_camera_transform ? PlayerMain::get_camera_transform(pm) : nullptr;
 	if (!unity_cam_raw) return;
 	auto* unity_cam = reinterpret_cast<II::Camera*>(unity_cam_raw);
@@ -178,6 +236,8 @@ void apg_aimbot::on_update() {
 
 		auto* pi = MirrorClientObject::get_player ? MirrorClientObject::get_player(client) : nullptr;
 		if (!pi) continue;
+
+		if (ClientPlayerInstance::get_is_active && !ClientPlayerInstance::get_is_active(pi)) continue;
 
 		II::Vector3 target_pos;
 		if (aim_head->get_value()) {
@@ -222,29 +282,67 @@ void apg_aimbot::on_update() {
 		}
 	}
 
-	if (!best_client) return;
+	if (!best_client) {
+		g_smooth_state.reset();
+		return;
+	}
 
-	// Convert aim direction → pitch/yaw in degrees
 	float aim_pitch, aim_yaw;
 	direction_to_euler_deg(best_dir, aim_pitch, aim_yaw);
 
+	auto now_time = cclk::now();
+
 	if (smooth->get_value()) {
-		// Blend from currentEuler toward aim, shortest path in yaw
-		float t = std::clamp(smooth_factor->get_value(), 0.f, 1.f);
-		float dp = aim_pitch - current_euler->x;
-		float dy = shortest_angle_delta(aim_yaw, current_euler->y);
-		target_euler->x = current_euler->x + dp * t;
-		target_euler->y = current_euler->y + dy * t;
+		if (!g_smooth_state || g_smooth_state->target != best_client) {
+			g_smooth_state = smooth_state_t{
+				current_euler->x, current_euler->y, now_time, best_client, false
+			};
+		}
+
+		if (g_smooth_state->locked) {
+			g_smooth_state->pitch = aim_pitch;
+			g_smooth_state->yaw   = aim_yaw;
+		} else {
+			float dt = std::chrono::duration<float>(now_time - g_smooth_state->last_tick).count();
+			dt = std::clamp(dt, 0.f, 0.1f);
+
+			float k = std::max(smooth_factor->get_value(), 0.01f) * 30.f;
+			float alpha = 1.f - std::exp(-k * dt);
+
+			float dp = aim_pitch - g_smooth_state->pitch;
+			float dy = shortest_angle_delta(aim_yaw, g_smooth_state->yaw);
+			g_smooth_state->pitch += dp * alpha;
+			g_smooth_state->yaw   += dy * alpha;
+
+			float rem_dp = aim_pitch - g_smooth_state->pitch;
+			float rem_dy = shortest_angle_delta(aim_yaw, g_smooth_state->yaw);
+			float err    = std::sqrt(rem_dp * rem_dp + rem_dy * rem_dy);
+			if (err < lock_threshold_deg->get_value()) {
+				g_smooth_state->locked = true;
+				g_smooth_state->pitch = aim_pitch;
+				g_smooth_state->yaw   = aim_yaw;
+				AIM_LOG("locked on client=" << best_client << " dist=" << best_dist << "m");
+			}
+		}
+
+		g_smooth_state->last_tick = now_time;
+
+		current_euler->x = g_smooth_state->pitch;
+		current_euler->y = g_smooth_state->yaw;
+		target_euler->x  = g_smooth_state->pitch;
+		target_euler->y  = g_smooth_state->yaw;
 	} else {
-		target_euler->x = aim_pitch;
-		target_euler->y = aim_yaw;
+		current_euler->x = aim_pitch;
+		current_euler->y = aim_yaw;
+		target_euler->x  = aim_pitch;
+		target_euler->y  = aim_yaw;
 	}
-	// Leave target_euler->z alone; game zeros it each frame anyway
 }
 
 apg_aimbot::apg_aimbot() : instance_module("apg_aimbot", category::COMBAT) {
 	add_value(values::BOOL,  always_on);
 	add_value(values::BOOL,  hold_rmb);
+	add_value(values::BOOL,  hold_lmb);
 	add_value(values::FLOAT, fov_deg);
 	add_value(values::FLOAT, max_range_m);
 	add_value(values::BOOL,  aim_head);
@@ -254,33 +352,44 @@ apg_aimbot::apg_aimbot() : instance_module("apg_aimbot", category::COMBAT) {
 	add_value(values::FLOAT, max_lead_m);
 	add_value(values::BOOL,  smooth);
 	add_value(values::FLOAT, smooth_factor);
+	add_value(values::FLOAT, lock_threshold_deg);
 
-	// Resolve field offsets so we don't depend on version-specific constants.
+	// Camera offsets
 	if (auto pClass = I::Get("Assembly-CSharp.dll")->Get("PlayerMain")) {
 		if (auto f = pClass->Get<IF>("<Camera>k__BackingField")) {
 			off_player_camera = f->offset;
 			AIM_LOG("PlayerMain.<Camera>k__BackingField offset = 0x" << std::hex << off_player_camera << std::dec);
-		} else {
-			AIM_LOG("WARN: <Camera>k__BackingField not found, using default 0x88");
 		}
 	}
-
 	auto pCamBase = I::Get("Assembly-CSharp.dll")->Get("CameraControlBase");
 	if (!pCamBase) pCamBase = I::Get("Assembly-CSharp.dll")->Get("CameraControlBase", "Player.Cameras");
 	if (pCamBase) {
-		if (auto f = pCamBase->Get<IF>("targetEuler")) {
-			off_target_euler = f->offset;
-			AIM_LOG("CameraControlBase.targetEuler offset = 0x" << std::hex << off_target_euler << std::dec);
-		} else {
-			AIM_LOG("WARN: targetEuler not found, using default 0x48");
-		}
-		if (auto f = pCamBase->Get<IF>("currentEuler")) {
-			off_current_euler = f->offset;
-			AIM_LOG("CameraControlBase.currentEuler offset = 0x" << std::hex << off_current_euler << std::dec);
-		} else {
-			AIM_LOG("WARN: currentEuler not found, using default 0x54");
-		}
-	} else {
-		AIM_LOG("WARN: CameraControlBase class not found");
+		if (auto f = pCamBase->Get<IF>("targetEuler"))  off_target_euler  = f->offset;
+		if (auto f = pCamBase->Get<IF>("currentEuler")) off_current_euler = f->offset;
+		AIM_LOG("CameraControlBase.targetEuler/currentEuler offsets = 0x"
+			<< std::hex << off_target_euler << " / 0x" << off_current_euler << std::dec);
 	}
+
+	// Charge-state offsets ("Ready Attack" chain)
+	if (auto pClass = I::Get("Assembly-CSharp.dll")->Get("CombatManager")) {
+		if (auto f = pClass->Get<IF>("<ChargeHandler>k__BackingField")) {
+			off_cm_charge_handler = f->offset;
+		}
+	}
+	auto pCh = I::Get("Assembly-CSharp.dll")->Get("PlayerCombatChargeHandler");
+	if (!pCh) pCh = I::Get("Assembly-CSharp.dll")->Get("PlayerCombatChargeHandler", "Player.Managers.Combat");
+	if (!pCh) pCh = I::Get("Assembly-CSharp.dll")->Get("PlayerCombatChargeHandler", "Player.Managers");
+	if (pCh) {
+		if (auto f = pCh->Get<IF>("<LeftHandler>k__BackingField"))  off_ch_left_handler  = f->offset;
+		if (auto f = pCh->Get<IF>("<RightHandler>k__BackingField")) off_ch_right_handler = f->offset;
+	}
+	auto pSub = I::Get("Assembly-CSharp.dll")->Get("PlayerCombatChargeSubHandler");
+	if (!pSub) pSub = I::Get("Assembly-CSharp.dll")->Get("PlayerCombatChargeSubHandler", "Player.Managers.Combat");
+	if (pSub) {
+		if (auto f = pSub->Get<IF>("attackChargeTime")) off_sub_charge_time = f->offset;
+	}
+	AIM_LOG("Charge offsets: CM.ChargeHandler=0x" << std::hex << off_cm_charge_handler
+		<< " CH.Left=0x"  << off_ch_left_handler
+		<< " CH.Right=0x" << off_ch_right_handler
+		<< " Sub.attackChargeTime=0x" << off_sub_charge_time << std::dec);
 }
